@@ -1,1768 +1,804 @@
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using Xamarin.Forms;
 
-namespace Raspredelenie_rabot
+namespace FieldManager
 {
-    public partial class Admin : Form
+    public partial class App : Application
     {
-        public Admin()
+        public static List<Field> Fields { get; set; }
+        public static List<HistoryRecord> HistoryRecords { get; set; } = new List<HistoryRecord>();
+
+        public App()
         {
             InitializeComponent();
-        }
 
-        private void Admin_Load(object sender, EventArgs e)
-        {
-
-            Class1.sss = "Заказчики";
-            update();
-
-            iddd = 0;
-
-        }
-        public void update()
-        {
-            DataTable table = new DataTable();
-            DB db = new DB();
-            SqlDataAdapter adapter = new SqlDataAdapter();
-            Admt.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            table.Clear();
-            string zad = "";
-            if (Class1.sss == "Админ")
-            {
-                zad = $"select  * from [Workers] where Post = 'Admin'";
-
-            }
-            else if (Class1.sss == "Тим-лид")
-            {
-                zad = $"select  * from [Workers]  where Post = 'Tim'";
-
-            }
-            else if (Class1.sss == "Работники")
-            {
-                zad = $"select  * from [Workers] where Post = 'Prog' or Post = 'Rekl'";
-
-            }
-            else
-            {
-                zad = $"select  * from [Customer]";
-
-            }
-            SqlCommand command = new SqlCommand(zad, db.getConnection());
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            Admt.DataSource = table;
-        }
-        private void Button1_Click(object sender, EventArgs e)
-        {
-
-
-            Class1.sss = "Заказчики";
-            update();
-            iddd = 0;
-        }
-
-        private void Button2_Click(object sender, EventArgs e)
-        {
-
-
-            Class1.sss = "Работники";
-            update();
-            iddd = 0;
-        }
-
-        private void Button3_Click(object sender, EventArgs e)
-        {
-
-
-            Class1.sss = "Тим-лид";
-            update();
-            iddd = 0;
-        }
-
-        private void Button4_Click(object sender, EventArgs e)
-        {
-
-
-            Class1.sss = "Админ";
-            update();
-            iddd = 0;
-        }
-
-
-        private void Button5_Click(object sender, EventArgs e)
-        {
-
-            Class1.t = false;
-            Dob d = new Dob();
-            d.ShowDialog();
-            update();
-
-        }
-        int iddd = 0;
-
-        string a1 = "";
-        string a2 = "";
-        string a3 = "";
-        string a4 = "";
-        string a5 = "";
-        string a6 = "";
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            int selectedRow = e.RowIndex;
-            // Проверяем, что индекс строки положителен
-            if (e.RowIndex >= 0)
-            {
-                // Получаем выбранную строку
-                DataGridViewRow row = Admt.Rows[selectedRow];
-                iddd = Convert.ToInt32(row.Cells[0].Value.ToString());
-                Class1.idd = iddd;
-                if (Class1.sss != "Заказчики")
-                {
-                    Class1.log = row.Cells[5].Value.ToString();
-                }
-                else
-                {
-                    Class1.log = row.Cells[3].Value.ToString();
-                }
-
-                if (Class1.sss == "Заказчики")
-                {
-                    a1 = row.Cells[1].Value.ToString();
-                    a2 = row.Cells[2].Value.ToString();
-                    a3 = row.Cells[3].Value.ToString();
-                    a4 = row.Cells[4].Value.ToString();
-
-                }
-                else if (Class1.sss == "Работники")
-                {
-                    a1 = row.Cells[1].Value.ToString();
-                    a2 = row.Cells[2].Value.ToString();
-                    a3 = row.Cells[3].Value.ToString();
-                    a4 = row.Cells[4].Value.ToString();
-                    a5 = row.Cells[5].Value.ToString();
-                    a6 = row.Cells[6].Value.ToString();
-                }
-
-                else
-                {
-                    a1 = row.Cells[1].Value.ToString();
-                    a2 = row.Cells[2].Value.ToString();
-                    a3 = row.Cells[3].Value.ToString();
-                    a4 = row.Cells[4].Value.ToString();
-                    a5 = row.Cells[5].Value.ToString();
-                    a6 = row.Cells[6].Value.ToString();
-                }
-
-            }
-        }
-
-        private void button6_Click(object sender, EventArgs e)
-        {
-
-            Class1.t = true;
-            if (iddd != 0)
-            {
-                Dob d = new Dob();
-                if (Class1.sss == "Заказчики")
-                {
-                    d.textBox1.Text = a1;
-                    d.textBox2.Text = a2;
-                    d.textBox3.Text = a3;
-                    d.textBox4.Text = a4;
-
-                }
-
-                else
-                {
-                    d.textBox1.Text = a1;
-                    d.textBox2.Text = a2;
-                    d.textBox3.Text = a3;
-                    d.textBox4.Text = a5;
-                    d.textBox5.Text = a6;
-                    d.comboBox1.Text = a4;
-                }
-                d.ShowDialog();
-            }
-            else { MessageBox.Show("Выберите строку, которую хотите изменить!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Information); }
-
-            update();
-        }
-
-        private void Admin_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void button7_Click(object sender, EventArgs e)
-        {
-            delete();
-
-        }
-        public void delete()
-        {
-            if (iddd != 0)
-            {
-                if (Class1.sss == "Заказчики")
-                {
-                    string del0 = $"DELETE FROM Work_by_order WHERE Id_order IN (SELECT Id_order FROM Orders WHERE Id_customer = '{iddd}');";
-                    string del = $"delete from Orders where Id_customer = '{iddd}' ";
-                    string del1 = $"delete from Customer where Id_customer = '{iddd}' ";
-                    DB db = new DB();
-                    var command0 = new SqlCommand(del0, db.getConnection());
-                    var command = new SqlCommand(del, db.getConnection());
-                    var command1 = new SqlCommand(del1, db.getConnection());
-                    db.openConnection();
-                    command0.ExecuteNonQuery();
-                    command.ExecuteNonQuery();
-                    command1.ExecuteNonQuery();
-                    db.closeConnection();
-
-
-                }
-                else
-                {
-                    string del = $"delete from Work_by_order where Id_workers = '{iddd}' ";
-                    string del1 = $"delete from Workers where Id_workers = '{iddd}' ";
-                    DB db = new DB();
-                    var command = new SqlCommand(del, db.getConnection());
-                    var command1 = new SqlCommand(del1, db.getConnection());
-                    db.openConnection();
-                    command.ExecuteNonQuery();
-                    command1.ExecuteNonQuery();
-                    db.closeConnection();
-                }
-
-                iddd = 0;
-            }
-            else { MessageBox.Show("Выберите строку, которую хотите удалить!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Information); }
-
-            update();
-        }
-
-        private void Admt_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
+            // Установим стартовой страницей NavigationPage
+            MainPage = new NavigationPage(new MainPage());
         }
     }
 }
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Raspredelenie_rabot
-{
-    public static class Class1
-    {
-        public static int id=0;
-        public static int id_ord = 0;
-        public static int idd = 0;
-        public static bool t = false;
-        public static string txt="";
-        internal static string popr = "";
-        internal static string worrk = "";
-        internal static string srook = "";
-        public static string sss = "";
-        internal static string log = "";
-
-
-
-    }
-}
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
-namespace Raspredelenie_rabot
+namespace RemoteDatabaseManager
 {
-    public partial class Customer : Form
+    public class DatabaseHelper
     {
-     
+        // Строка подключения к удалённой базе данных
+        private readonly string _connectionString = "Data Source=your_remote_ip_or_dns;Initial Catalog=FieldManagerDB;User ID=your_username;Password=your_password;Integrated Security=False;";
 
-        public Customer()
+        // Метод для добавления поля
+        public void AddField(string name, int size, bool isSown)
         {
-            InitializeComponent();
-     
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Sozd sozd = new Sozd();
-
-            sozd.ShowDialog();
-            update();
-        }
-
-        DB db = new DB();
-        SqlDataAdapter adapter = new SqlDataAdapter();
-        private void Customer_Load(object sender, EventArgs e)
-        {
-
-
-            update();
-
-                        
-                
-            
-
-        }
-        public void update()
-        {
-            Custm.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            DataTable table = new DataTable();
-            table.Clear();
-            string zadan = $"select id_order, term, explanation, Status from [Orders]  where Id_customer = {Class1.id}";
-            SqlCommand command = new SqlCommand(zadan, db.getConnection());
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            Custm.DataSource = table;
-
-            for (int j = 0; j < Custm.RowCount; j++)
+            using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                switch (Custm[3, j].Value.ToString())
-                {
+                string query = "INSERT INTO Fields (Name, Size, IsSown) VALUES (@Name, @Size, @IsSown)";
+                SqlCommand cmd = new SqlCommand(query, con);
 
-                    case "Не начато":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            Custm[i, j].Style.BackColor = Color.Red;
-                        }
-                        break;
-                    case "В работе":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            Custm[i, j].Style.BackColor = Color.Orange;
-                        }
-                        break;
-                    case "Маркетинг готов":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            Custm[i, j].Style.BackColor = Color.Gold;
-                        }
-                        break;
-                    case "Программа написанна":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            Custm[i, j].Style.BackColor = Color.Gold;
-                        }
-                        break;
-                    case "Выполнено":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            Custm[i, j].Style.BackColor = Color.YellowGreen;
-                        }
-                        break;
-                    case "Изменено":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            Custm[i, j].Style.BackColor = Color.SkyBlue;
-                        }
-                        break;
-                }
-            }
-        }
+                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@Size", size);
+                cmd.Parameters.AddWithValue("@IsSown", isSown);
 
-        private void button4_Click(object sender, EventArgs e)
-        {
-           
-            
-
-        }
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-        
-          int selectedRow = e.RowIndex;
-            // Проверяем, что индекс строки положителен
-            if (e.RowIndex >= 0)
-            {
-                // Получаем выбранную строку
-                DataGridViewRow row = Custm.Rows[selectedRow];
-                Class1.id_ord = Convert.ToInt32(row.Cells[0].Value.ToString());
-                Class1.srook = row.Cells[1].Value.ToString();
-                Class1.popr = row.Cells[2].Value.ToString();
-
-            }
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            Class1.txt = "popr";
-
-            Sozd sozd = new Sozd();
-            sozd.ShowDialog();
-            update();
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void Customer_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-        }
-    }
-}
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SqlClient;
-
-
-namespace Raspredelenie_rabot
-{
-    internal class DB
-    {
-        SqlConnection con = new SqlConnection(@"Data Source=345A-002;Initial Catalog=menedzhment;Integrated Security=True");
-
-        // Метод открытия соединения с базой данных.
-        public void openConnection()
-        {
-            // Проверяем, что соединение закрыто, и открываем его.
-            if (con.State == System.Data.ConnectionState.Closed)
-            {
                 con.Open();
+                cmd.ExecuteNonQuery();
             }
         }
-        // Метод закрытия соединения с базой данных.
-        public void closeConnection()
+
+        // Метод для получения всех полей
+        public DataTable GetAllFields()
         {
-            // Проверяем, что соединение открыто, и закрываем его.
-            if (con.State == System.Data.ConnectionState.Open)
+            using (SqlConnection con = new SqlConnection(_connectionString))
             {
-                con.Close();
+                string query = "SELECT * FROM Fields";
+                SqlDataAdapter adapter = new SqlDataAdapter(query, con);
+
+                DataTable fieldsTable = new DataTable();
+                adapter.Fill(fieldsTable);
+
+                return fieldsTable;
             }
         }
-        // Метод получения объекта соединения.
-        public SqlConnection getConnection()
+
+        // Метод для добавления семян
+        public void AddSeed(string name, float quantity, float consumptionRate, string allowedMonths)
         {
-            return con;
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                string query = "INSERT INTO Seeds (Name, Quantity, ConsumptionRate, AllowedMonths) VALUES (@Name, @Quantity, @ConsumptionRate, @AllowedMonths)";
+                SqlCommand cmd = new SqlCommand(query, con);
+
+                cmd.Parameters.AddWithValue("@Name", name);
+                cmd.Parameters.AddWithValue("@Quantity", quantity);
+                cmd.Parameters.AddWithValue("@ConsumptionRate", consumptionRate);
+                cmd.Parameters.AddWithValue("@AllowedMonths", allowedMonths);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        // Метод для получения всех семян
+        public DataTable GetAllSeeds()
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT * FROM Seeds";
+                SqlDataAdapter adapter = new SqlDataAdapter(query, con);
+
+                DataTable seedsTable = new DataTable();
+                adapter.Fill(seedsTable);
+
+                return seedsTable;
+            }
+        }
+
+        // Метод для добавления записи в историю
+        public void AddHistoryRecord(string action, DateTime date)
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                string query = "INSERT INTO HistoryRecords (Action, Date) VALUES (@Action, @Date)";
+                SqlCommand cmd = new SqlCommand(query, con);
+
+                cmd.Parameters.AddWithValue("@Action", action);
+                cmd.Parameters.AddWithValue("@Date", date);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        // Метод для получения истории действий
+        public DataTable GetHistory()
+        {
+            using (SqlConnection con = new SqlConnection(_connectionString))
+            {
+                string query = "SELECT * FROM HistoryRecords ORDER BY Date DESC";
+                SqlDataAdapter adapter = new SqlDataAdapter(query, con);
+
+                DataTable historyTable = new DataTable();
+                adapter.Fill(historyTable);
+
+                return historyTable;
+            }
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            DatabaseHelper dbHelper = new DatabaseHelper();
+
+            // Добавление данных
+            dbHelper.AddField("Field 1", 100, true);
+            dbHelper.AddSeed("Wheat", 500.5f, 2.5f, "March, April, May");
+            dbHelper.AddHistoryRecord("Added a new field", DateTime.Now);
+
+            // Получение данных
+            DataTable fields = dbHelper.GetAllFields();
+            DataTable seeds = dbHelper.GetAllSeeds();
+            DataTable history = dbHelper.GetHistory();
+
+            // Вывод данных
+            Console.WriteLine("Fields:");
+            foreach (DataRow row in fields.Rows)
+            {
+                Console.WriteLine($"Id: {row["Id"]}, Name: {row["Name"]}, Size: {row["Size"]}, IsSown: {row["IsSown"]}");
+            }
+
+            Console.WriteLine("\nSeeds:");
+            foreach (DataRow row in seeds.Rows)
+            {
+                Console.WriteLine($"Id: {row["Id"]}, Name: {row["Name"]}, Quantity: {row["Quantity"]}, ConsumptionRate: {row["ConsumptionRate"]}, AllowedMonths: {row["AllowedMonths"]}");
+            }
+
+            Console.WriteLine("\nHistory:");
+            foreach (DataRow row in history.Rows)
+            {
+                Console.WriteLine($"Id: {row["Id"]}, Action: {row["Action"]}, Date: {row["Date"]}");
+            }
+        }
+    }
+}
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FieldManager.EditFieldPage">
+    <StackLayout Padding="20">
+        <Label Text="Редактировать характеристики поля" FontSize="Large" HorizontalOptions="Center" />
+
+        <Entry x:Name="NameEntry" Placeholder="Название поля" />
+        <Entry x:Name="SizeEntry" Placeholder="Размер поля (км²)" Keyboard="Numeric" />
+
+        <Button Text="Сохранить" Clicked="OnSaveClicked" />
+        <Button Text="Отмена" Clicked="OnCancelClicked" />
+    </StackLayout>
+</ContentPage>
+using System;
+using Xamarin.Forms;
+
+namespace FieldManager
+{
+    public partial class EditFieldPage : ContentPage
+    {
+        private Field _field;
+
+        public EditFieldPage(Field field)
+        {
+            InitializeComponent();
+            _field = field;
+
+            // Заполняем поля данными
+            NameEntry.Text = _field.Name;
+            SizeEntry.Text = _field.Size.ToString();
+        }
+
+        private async void OnSaveClicked(object sender, EventArgs e)
+        {
+            // Обновляем характеристики поля
+            _field.Name = NameEntry.Text;
+            if (int.TryParse(SizeEntry.Text, out int newSize))
+            {
+                _field.Size = newSize;
+            }
+            else
+            {
+                await DisplayAlert("Ошибка", "Введите корректный размер.", "ОК");
+                return;
+            }
+
+            // Закрываем модальное окно
+            await Navigation.PopModalAsync();
+        }
+
+        private async void OnCancelClicked(object sender, EventArgs e)
+        {
+            // Закрываем модальное окно без изменений
+            await Navigation.PopModalAsync();
+        }
+    }
+}
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FieldManager.EditSeedPage">
+    <StackLayout Padding="20">
+        <Label Text="Редактирование семян" FontSize="Large" HorizontalOptions="Center" />
+        <Entry x:Name="NameEntry" Placeholder="Название семян" />
+        <Entry x:Name="QuantityEntry" Placeholder="Количество (кг)" Keyboard="Numeric" />
+        <Entry x:Name="ConsumptionRateEntry" Placeholder="Расход (кг/км²)" Keyboard="Numeric" />
+        <Label Text="Доступные месяцы для посева:" />
+        <Editor x:Name="AllowedMonthsEditor" Placeholder="Введите месяцы через запятую (например, Март, Апрель)" />
+
+        <Button Text="Сохранить" Clicked="OnSaveClicked" />
+        <Button Text="Отмена" Clicked="OnCancelClicked" />
+    </StackLayout>
+</ContentPage>
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using Xamarin.Forms;
+
+namespace FieldManager
+{
+    public partial class EditSeedPage : ContentPage
+    {
+        private Seed _seed;
+
+        public EditSeedPage(Seed seed = null)
+        {
+            InitializeComponent();
+            _seed = seed;
+
+            // Если редактируем существующее семя, заполняем поля
+            if (_seed != null)
+            {
+                NameEntry.Text = _seed.Name;
+                QuantityEntry.Text = _seed.Quantity.ToString();
+                ConsumptionRateEntry.Text = _seed.ConsumptionRate.ToString();
+                AllowedMonthsEditor.Text = string.Join(", ", _seed.AllowedMonths);
+            }
+        }
+
+        private async void OnSaveClicked(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(NameEntry.Text) || !double.TryParse(QuantityEntry.Text, out double quantity))
+            {
+                await DisplayAlert("Ошибка", "Введите корректные данные.", "ОК");
+                return;
+            }
+
+            if (_seed == null) // Новое семя
+            {
+                var newSeed = new Seed
+                {
+                    Id = Warehouse.Seeds.Count + 1,
+                    Name = NameEntry.Text,
+                    Quantity = quantity,
+                    AllowedMonths = new List<string> { "Март", "Апрель", "Май" }, // Пример месяца
+                    ConsumptionRate = double.Parse(ConsumptionRateEntry.Text)
+                };
+
+                Warehouse.Seeds.Add(newSeed);
+
+                // Добавляем запись в историю
+                App.HistoryRecords.Add(new HistoryRecord
+                {
+                    Action = $"Добавили новое семя '{newSeed.Name}' ({newSeed.Quantity:F2} кг)",
+                    Date = DateTime.Now
+                });
+
+                await DisplayAlert("Успех", "Новое семя добавлено.", "ОК");
+            }
+            else // Редактирование существующего семени
+            {
+                _seed.Name = NameEntry.Text;
+                _seed.Quantity = quantity;
+
+                // Добавляем запись в историю
+                App.HistoryRecords.Add(new HistoryRecord
+                {
+                    Action = $"Отредактировали семя '{_seed.Name}' (новое количество: {_seed.Quantity:F2} кг)",
+                    Date = DateTime.Now
+                });
+
+                await DisplayAlert("Успех", "Семя обновлено.", "ОК");
+            }
+
+            await Navigation.PopAsync();
+        }
+
+
+        private async void OnCancelClicked(object sender, EventArgs e)
+        {
+            await Navigation.PopAsync();
+        }
+    }
+}
+using System.ComponentModel;
+
+public class Field : INotifyPropertyChanged
+{
+    private bool _isSown;
+
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int Size { get; set; }
+
+    public bool IsSown
+    {
+        get => _isSown;
+        set
+        {
+            if (_isSown != value)
+            {
+                _isSown = value;
+                OnPropertyChanged(nameof(IsSown));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FieldManager.FieldsPage">
+    <StackLayout>
+        <Label Text="Выберите месяц:" FontSize="Large" HorizontalOptions="Center" />
+        <Picker x:Name="MonthPicker" Title="Месяц" SelectedIndexChanged="OnMonthSelected">
+            <Picker.Items>
+                <x:String>Сентябрь</x:String>
+                <x:String>Октябрь</x:String>
+                <x:String>Ноябрь</x:String>
+                <x:String>Декабрь</x:String>
+                <x:String>Январь</x:String>
+                <x:String>Февраль</x:String>
+                <x:String>Март</x:String>
+                <x:String>Апрель</x:String>
+                <x:String>Май</x:String>
+                <x:String>Июнь</x:String>
+                <x:String>Июль</x:String>
+                <x:String>Август</x:String>
+            </Picker.Items>
+        </Picker>
+
+        <CollectionView x:Name="FieldsCollectionView"
+                SelectionMode="Single"
+                SelectionChanged="OnFieldSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Padding="10" Margin="5">
+                        <StackLayout>
+                            <Label Text="{Binding Name}" FontSize="Medium" TextColor="White" />
+
+                        </StackLayout>
+                        <Frame.Triggers>
+                            <DataTrigger TargetType="Frame" Binding="{Binding IsSown}" Value="True">
+                                <Setter Property="BackgroundColor" Value="LightGreen" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Frame" Binding="{Binding IsSown}" Value="False">
+                                <Setter Property="BackgroundColor" Value="SaddleBrown" />
+                            </DataTrigger>
+                        </Frame.Triggers>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </StackLayout>
+</ContentPage>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Input;
+using Xamarin.Forms;
+
+namespace FieldManager
+{
+    public partial class FieldsPage : ContentPage
+    {
+        private List<Field> _fields; // Список полей
+        private string _selectedMonth; // Выбранный месяц
+        public ICommand ClearFieldCommand { get; }
+        public FieldsPage()
+        {
+            InitializeComponent();
+
+
+            // Используем статический список для сохранения состояния
+            if (App.Fields == null)
+            {
+                App.Fields = new List<Field>
+            {
+                new Field { Id = 1, Name = "Поле 1", Size = 30 },
+                new Field { Id = 2, Name = "Поле 2", Size = 40 },
+                new Field { Id = 3, Name = "Поле 3", Size = 50 },
+                new Field { Id = 4, Name = "Поле 4", Size = 60 },
+                new Field { Id = 5, Name = "Поле 5", Size = 70 },
+                new Field { Id = 6, Name = "Поле 6", Size = 80 },
+                new Field { Id = 7, Name = "Поле 7", Size = 90 }
+            };
+            }
+
+            FieldsCollectionView.ItemsSource = App.Fields;
+        }
+
+
+        // Обработчик изменения выбранного месяца
+        private void OnMonthSelected(object sender, EventArgs e)
+        {
+            _selectedMonth = MonthPicker.SelectedItem as string;
+
+            if (string.IsNullOrEmpty(_selectedMonth))
+            {
+                DisplayAlert("Ошибка", "Выберите месяц.", "ОК");
+                return;
+            }
+
+
+        }
+
+        // Обработчик выбора поля
+        private async void OnFieldSelected(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedField = e.CurrentSelection.FirstOrDefault() as Field;
+
+            if (selectedField == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_selectedMonth))
+            {
+                await DisplayAlert("Ошибка", "Сначала выберите месяц.", "ОК");
+                FieldsCollectionView.SelectedItem = null;
+                return;
+            }
+
+
+
+            // Переход на страницу посева
+            await Navigation.PushAsync(new SowingPage(selectedField, _selectedMonth));
+
+            // Обновляем отображение
+            FieldsCollectionView.SelectedItem = null;
+        }
+
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            // Обновляем источник данных, чтобы отобразить актуальный статус полей
+            FieldsCollectionView.ItemsSource = null;
+            FieldsCollectionView.ItemsSource = App.Fields;
+        }
+
+        public void UpdateFields()
+        {
+            FieldsCollectionView.ItemsSource = null;
+            FieldsCollectionView.ItemsSource = App.Fields;
+        }
+    }
+}
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FieldManager.HistoryPage">
+    <StackLayout>
+        <Label Text="История действий" FontSize="Large" HorizontalOptions="Center" />
+        <ListView x:Name="HistoryListView">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding Action}" Detail="{Binding Date}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>
+using System.Linq;
+using Xamarin.Forms;
+
+namespace FieldManager
+{
+    public partial class HistoryPage : ContentPage
+    {
+        public HistoryPage()
+        {
+            InitializeComponent();
+
+            // Привязываем историю
+            HistoryListView.ItemsSource = App.HistoryRecords
+                .OrderByDescending(record => record.Date) // Сортировка по убыванию даты
+                .Select(record => new { record.Action, Date = record.Date.ToString("dd.MM.yyyy HH:mm") });
         }
     }
 }
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace Raspredelenie_rabot
+public class HistoryRecord
 {
-    public partial class Dob : Form
+    public string Action { get; set; } // Описание действия
+    public DateTime Date { get; set; } // Дата действия
+}
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FieldManager.MainPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Поля" Clicked="OnFieldsClicked" />
+        <ToolbarItem Text="Склад" Clicked="OnWarehouseClicked" />
+        <ToolbarItem Text="История" Clicked="OnHistoryClicked" />
+    </ContentPage.ToolbarItems>
+    <StackLayout>
+        <Label Text="Добро пожаловать в систему управления полями!" 
+               FontSize="Medium"
+               VerticalOptions="CenterAndExpand"
+               HorizontalOptions="CenterAndExpand" />
+    </StackLayout>
+</ContentPage>
+using System;
+
+using Xamarin.Forms;
+
+namespace FieldManager
+{
+    public partial class MainPage : ContentPage
     {
-        public Dob()
+        public MainPage()
         {
             InitializeComponent();
         }
-        public void zapr(string a1, string a2, string a3, string a4, string a5, int id)
+        private async void OnFieldsClicked(object sender, EventArgs e)
         {
+            await Navigation.PushAsync(new FieldsPage());
+        }
 
-            DB db = new DB();
-           
-            
-        
+        private async void OnWarehouseClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new WarehousePage());
+        }
 
-            db.openConnection();
- 
+        private async void OnHistoryClicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new HistoryPage());
+        }
 
+        private async void OnInvoicesClicked(object sender, EventArgs e)
+        {
+            // Реализуйте аналогично другие страницы
+        }
 
-            var addQuery = "";
-            if (Class1.sss == "Админ")
+    }
+}
+using System.Collections.Generic;
+
+public class Seed
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public double Quantity { get; set; }
+    public List<string> AllowedMonths { get; set; } // Месяцы для посева
+    public double ConsumptionRate { get; set; }    // Расход семян (кг/км²)
+}
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FieldManager.SowingPage">
+    <StackLayout Padding="20">
+        <Label Text="Посев семян" FontSize="Large" HorizontalOptions="Center" />
+        <Label x:Name="FieldInfoLabel" FontSize="Medium" />
+
+        <!-- Указываем свойство ItemDisplayBinding -->
+        <Picker x:Name="SeedPicker" Title="Выберите семена" ItemDisplayBinding="{Binding Name}" />
+
+        <Label Text="Требуется (кг):" />
+        <Label x:Name="RequiredSeedsLabel" FontSize="Medium" />
+        <Label Text="На складе (кг):" />
+        <Label x:Name="AvailableSeedsLabel" FontSize="Medium" />
+        <Button Text="Засеять" Clicked="OnSowButtonClicked" />
+        <Button Text="Очистить" Clicked="ClearClicked" />
+    </StackLayout>
+</ContentPage>
+using System;
+using System.Linq;
+using Xamarin.Forms;
+
+namespace FieldManager
+{
+    public partial class SowingPage : ContentPage
+    {
+        private Field _field; // Строго типизированное поле
+        private double _requiredSeeds;
+
+        public SowingPage(Field field, string selectedMonth)
+        {
+            InitializeComponent();
+            _field = field;
+
+            FieldInfoLabel.Text = $"Поле: {_field.Name}, Размер: {_field.Size} км²";
+
+            // Фильтруем семена по выбранному месяцу
+            var availableSeeds = Warehouse.Seeds
+                .Where(seed => seed.AllowedMonths.Contains(selectedMonth))
+                .ToList();
+
+            if (availableSeeds.Any())
             {
-
-                if (Class1.t == true)
-                    addQuery = $"UPDATE Workers SET Name_workers='{a1}', Lastname_workers='{a2}', Patronymic_workers='{a3}',Post='Admin', Login_workers ='{a4}', Password_workers ='{a5}'  WHERE Id_workers={id}";
-                else            
-                    addQuery = $"insert into Workers (Name_workers, Lastname_workers, Patronymic_workers, Post, Login_workers, Password_workers) values ('{a1}', '{a2}', '{a3}', 'Admin' , '{a4}', '{a5}')";
-        
+                SeedPicker.ItemsSource = availableSeeds;
+            }
+            else
+            {
+                DisplayAlert("Нет доступных семян", $"В месяце {selectedMonth} нельзя засеять поле.", "ОК");
+                Navigation.PopAsync();
             }
 
+            SeedPicker.ItemDisplayBinding = new Binding("Name");
+            SeedPicker.SelectedIndexChanged += OnSeedSelected;
+        }
 
-            else if (Class1.sss == "Работники")
+
+
+        private void OnSeedSelected(object sender, EventArgs e)
+        {
+            var selectedSeed = SeedPicker.SelectedItem as Seed;
+            if (selectedSeed != null)
             {
-
-            
-                    if (Class1.t == true)
-                        addQuery = $"UPDATE Workers SET Name_workers='{a1}', Lastname_workers='{a2}', Patronymic_workers='{a3}',Post='{comboBox1.Text}', Login_workers ='{a4}', Password_workers ='{a5}'  WHERE Id_workers={id}";
-                    else
-                        addQuery = $"insert into Workers (Name_workers, Lastname_workers, Patronymic_workers, Post, Login_workers, Password_workers) values ('{a1}', '{a2}', '{a3}', '{comboBox1.Text}' , '{a4}', '{a5}')";
-
-                
+                _requiredSeeds = _field.Size * selectedSeed.ConsumptionRate; // Расход семян
+                RequiredSeedsLabel.Text = $"{_requiredSeeds:F2} кг"; // Округление до 2 знаков
+                AvailableSeedsLabel.Text = $"{selectedSeed.Quantity:F2} кг";
             }
+        }
 
-     
-            else if (Class1.sss == "Тим-лид")
+
+        private async void OnSowButtonClicked(object sender, EventArgs e)
+        {
+            var selectedSeed = SeedPicker.SelectedItem as Seed;
+
+            if (_field.IsSown == true)
             {
-
-              
-                    if (Class1.t == true)
-                        addQuery = $"UPDATE Workers SET Name_workers='{a1}', Lastname_workers='{a2}', Patronymic_workers='{a3}',Post='Tim', Login_workers ='{a4}', Password_workers ='{a5}'  WHERE Id_workers={id}";
-                    else
-                        addQuery = $"insert into Workers (Name_workers, Lastname_workers, Patronymic_workers, Post, Login_workers, Password_workers) values ('{a1}', '{a2}', '{a3}', 'Tim' , '{a4}', '{a5}')";
-
-                
+                await DisplayAlert("Ошибка", $"Поле уже посеяно", "ОК");
+                return;
             }
-
-            else if (Class1.sss == "Заказчики")
+            if (selectedSeed != null)
             {
+                if (selectedSeed.Quantity >= _requiredSeeds)
+                {
+                    // Уменьшаем количество семян
+                    selectedSeed.Quantity -= _requiredSeeds;
 
-                    if (Class1.t == true)
+                    // Помечаем поле как засеянное
+                    _field.IsSown = true;
 
-                        addQuery = $"UPDATE Customer SET Lastname_customer='{a1}', Organization='{a2}', Login_customer='{a3}', Password_customer='{a4}'  WHERE Id_customer={id}";
-                   
+                    // Добавляем запись в историю
+                    App.HistoryRecords.Add(new HistoryRecord
+                    {
+                        Action = $"Засеяли поле '{_field.Name}' семенами '{selectedSeed.Name}' ({_requiredSeeds:F2} кг)",
+                        Date = DateTime.Now
+                    });
+
+                    await DisplayAlert("Успех", $"{_field.Name} успешно засеяно семенами {selectedSeed.Name}.", "ОК");
+
+                    // Закрываем страницу посева
+                    await Navigation.PopAsync();
+                }
                 else
-                        addQuery = $"insert into Customer (Lastname_customer, Organization, Login_customer, Password_customer) values ('{a1}', '{a2}', '{a3}',  '{a4}')";
-
-                
-            }
-          
-
-            if (Class1.sss != "Заказчики")
-            {
-            SqlDataAdapter adapter1 = new SqlDataAdapter();     
-            DataTable table1 = new DataTable();
-            string q = $"select * from Workers where Login_workers = '{a4}'";
-            SqlCommand commanqd1 = new SqlCommand(q, db.getConnection());
-            adapter1.SelectCommand = commanqd1;
-            adapter1.Fill(table1);
-
-
-            SqlDataAdapter adapter2 = new SqlDataAdapter();
-            DataTable table2 = new DataTable();
-            string q2 = $"select * from Customer where Login_customer = '{a4}'";
-            SqlCommand commanqd2 = new SqlCommand(q2, db.getConnection());
-            adapter2.SelectCommand = commanqd2;
-            adapter2.Fill(table2);
-
-                if ((table1.Rows.Count >= 1 || table2.Rows.Count >= 1) && Class1.log != a4)
                 {
-                    MessageBox.Show("Такой логин уже используется", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    this.Close();
-                    return;
+                    await DisplayAlert("Ошибка", $"Недостаточно семян {selectedSeed.Name} для посева.", "ОК");
                 }
-                else
-                {
-                    var command1 = new SqlCommand(addQuery, db.getConnection());
-                    command1.ExecuteNonQuery();
-                    if (Class1.t == true)
-                    {
-                        MessageBox.Show("Запись успешно изменена", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
+            }
+        }
 
-                        MessageBox.Show("Запись успешно создана", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    this.Close();
+
+
+
+
+        private async void ClearClicked(object sender, EventArgs e)
+        {
+            if (_field.IsSown)
+            {
+                // Сбрасываем статус поля
+                _field.IsSown = false;
+
+                // Добавляем запись в историю
+                App.HistoryRecords.Add(new HistoryRecord
+                {
+                    Action = $"Очистили поле '{_field.Name}'",
+                    Date = DateTime.Now
+                });
+
+                await DisplayAlert("Успех", $"{_field.Name} очищено.", "ОК");
+
+                // Обновляем интерфейс
+                FieldsPage fieldsPage = Navigation.NavigationStack.OfType<FieldsPage>().FirstOrDefault();
+                if (fieldsPage != null)
+                {
+                    fieldsPage.UpdateFields();
                 }
             }
             else
             {
-                SqlDataAdapter adapter1 = new SqlDataAdapter();
-                DataTable table1 = new DataTable();
-                string q = $"select * from Workers where Login_workers = '{a3}'";
-                SqlCommand commanqd1 = new SqlCommand(q, db.getConnection());
-                adapter1.SelectCommand = commanqd1;
-                adapter1.Fill(table1);
-
-
-                SqlDataAdapter adapter2 = new SqlDataAdapter();
-                DataTable table2 = new DataTable();
-                string q2 = $"select * from Customer where Login_customer = '{a3}'";
-                SqlCommand commanqd2 = new SqlCommand(q2, db.getConnection());
-                adapter2.SelectCommand = commanqd2;
-                adapter2.Fill(table2);
-                if ((table1.Rows.Count >= 1 || table2.Rows.Count >= 1) && Class1.log != a3)
-                {
-                    MessageBox.Show("Такой логин уже используется", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    this.Close();
-                    return;
-                }
-                else
-                {
-                    var command1 = new SqlCommand(addQuery, db.getConnection());
-                    command1.ExecuteNonQuery();
-                    if (Class1.t == true)
-                    {
-                        MessageBox.Show("Запись успешно изменена", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-
-                        MessageBox.Show("Запись успешно создана", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    this.Close();
-
-                }
-
+                // Поле уже пустое
+                await DisplayAlert("Ошибка", "Поле уже пустое.", "ОК");
             }
-            db.closeConnection();
-        }
-        private void Button1_Click(object sender, EventArgs e)
-        {
-
-            string a1 = textBox1.Text;
-            string a2 = textBox2.Text;
-            string a3 = textBox3.Text;
-            string a4 = textBox4.Text;
-            string a5 = textBox5.Text;
-
-            
-            int id = Class1.idd;
-     
-
-            zapr(a1, a2, a3, a4, a5, id);
-
-
         }
 
-        private void Dob_Load(object sender, EventArgs e)
-        {
-            if (Class1.sss == "Заказчики")
-            {
-                label1.Text = Class1.sss;
-                label3.Text = "Фамилия";
-                label4.Text = "Орг-ция";
-                label5.Text = "Логин";
-                label6.Text = "Пароль";
-                label7.Visible = false;
-                textBox5.Visible = false;
-                label8.Visible = false;
-                comboBox1.Visible = false;
 
-
-            }
-            else if (Class1.sss == "Работники")
-            {
-                label1.Text = Class1.sss;
-                label3.Text = "Имя";
-                label4.Text = "Фамилия";
-                label5.Text = "Отчество";;
-                label6.Text = "Логин";
-                label7.Text = "Пароль";
-                label8.Text = "Должность";
-            }
-            else if (Class1.sss == "Тим-лид")
-            {
-                label1.Text = Class1.sss;
-                label3.Text = "Имя";
-                label4.Text = "Фамилия";
-                label5.Text = "Отчество";
-                label6.Text = "Логин";
-                label7.Text = "Пароль";
-                label8.Visible = false;
-                comboBox1.Visible = false;
-
-            }
-            else if (Class1.sss == "Админ")
-            {
-                label1.Text = Class1.sss;
-                label3.Text = "Имя";
-                label4.Text = "Фамилия";
-                label5.Text = "Отчество";
-                label6.Text = "Логин";
-                label7.Text = "Пароль";
-                label8.Visible = false;
-                comboBox1.Visible = false;
-
-            }
-
-        }
-
-        private void dob_FormClosed(object sender, FormClosedEventArgs e)
-        {
-
-        }
     }
 }
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using FieldManager;
 
-namespace Raspredelenie_rabot
+namespace FieldManager
 {
-    public partial class Log : Form
+    public static class Warehouse
     {
-        public Log()
+        public static List<Seed> Seeds { get; set; } = new List<Seed>
+        {
+            new Seed { Id = 1, Name = "Пшеница", Quantity = 10001, AllowedMonths = new List<string> { "Март", "Апрель", "Май" }, ConsumptionRate = 10 },
+            new Seed { Id = 2, Name = "Рожь", Quantity = 8000, AllowedMonths = new List<string> { "Октябрь", "Ноябрь" }, ConsumptionRate = 8 },
+            new Seed { Id = 3, Name = "Ячмень", Quantity = 14900, AllowedMonths = new List<string> { "Май", "Июнь" }, ConsumptionRate = 12 },
+            // Добавьте другие культуры...
+        };
+    }
+}
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FieldManager.WarehousePage">
+    <StackLayout>
+        <Label Text="Склад семян" FontSize="Large" HorizontalOptions="Center" />
+        <Button Text="Добавить семя" Clicked="OnAddSeedClicked" />
+        <ListView x:Name="WarehouseListView" ItemTapped="OnSeedTapped">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding Name}" Detail="{Binding Quantity}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>
+using System;
+using System.Linq;
+using Xamarin.Forms;
+
+namespace FieldManager
+{
+    public partial class WarehousePage : ContentPage
+    {
+        public WarehousePage()
         {
             InitializeComponent();
+            WarehouseListView.ItemsSource = Warehouse.Seeds;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private async void OnAddSeedClicked(object sender, EventArgs e)
         {
-            if (textBox2.PasswordChar == 0)
+            // Переход на страницу добавления нового семени
+            await Navigation.PushAsync(new EditSeedPage());
+        }
+
+        private async void OnSeedTapped(object sender, ItemTappedEventArgs e)
+        {
+            if (e.Item is Seed selectedSeed)
             {
-                textBox2.PasswordChar = '*';
-                button2.Image = Image.FromFile("open_eye.png");
-            }
-            else
-            {
-                textBox2.PasswordChar = '\0';
-                button2.Image = Image.FromFile("close_eye.png");
-            }
-        }
-
-        private void label1_MouseEnter(object sender, EventArgs e)
-        {
-            label1.ForeColor = Color.Black;
-        }
-
-        private void label1_MouseLeave(object sender, EventArgs e)
-        {
-            label1.ForeColor = Color.Gray;
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-            Reg reg = new Reg();
-            this.Hide();
-            reg.Show();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            DB db = new DB();
-            string login = textBox1.Text;
-            string password = textBox2.Text;
-            SqlDataAdapter adapter = new SqlDataAdapter();
-            DataTable table = new DataTable();
-            string Worker = $"select Id_workers, Login_workers, Password_workers, Post from [Workers] where Login_workers = '{login}' and  Password_workers = '{password}'";
-            string Customer = $"select Id_customer, Login_customer, Password_customer from [Customer] where Login_customer = '{login}' and  Password_customer = '{password}'";
-
-            SqlCommand command = new SqlCommand(Worker, db.getConnection());
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            if (table.Rows.Count == 1)
-            {
-
-
-                Class1.id = Convert.ToInt32(table.Rows[0][0].ToString());
-
-             
-                string s = table.Rows[0][3].ToString();
-                if (s == "Admin")
-                {
-                    Admin adm = new Admin();
-                    this.Hide();
-                    adm.Show();
-                }
-                if (s == "Tim")
-                {
-                    Timlid tm = new Timlid();
-                    this.Hide();
-                    tm.Show();
-                }
-                if (s == "Rekl" || s=="Prog")
-                {
-                    Programmer wrk = new Programmer();
-                    this.Hide();
-                    wrk.Show();
-                }
-
-            }
-
-
-
-            SqlCommand command3 = new SqlCommand(Customer, db.getConnection());
-            adapter.SelectCommand = command3;
-            DataTable table2 = new DataTable();
-            adapter.Fill(table2);
-            if (table2.Rows.Count == 1)
-            {
-                Class1.id = Convert.ToInt32(table2.Rows[0][0].ToString());
-                Customer cr = new Customer();
-                this.Hide();
-                cr.Show();
-            }
-
-
-            else
-            {
-                label4.Text = "Неверный логин/пароль";
-
-            }
-
-
-
-
-
-
-
-        }
-
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-    }
-}
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace Raspredelenie_rabot
-{
-    internal static class Program
-    {
-        /// <summary>
-        /// Главная точка входа для приложения.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Log());
-        }
-    }
-}
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace Raspredelenie_rabot
-{
-    public partial class Programmer : Form
-    {
-        public Programmer()
-        {
-            InitializeComponent();
-        }
-        public void update()
-        {
-
-            DataTable table = new DataTable();
-            DB db = new DB();
-            SqlDataAdapter adapter = new SqlDataAdapter();
-            Protm.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            table.Clear();
-            string zadan = $"SELECT Orders.Id_order, Orders.term, Orders.explanation, Work_by_order.status_workera, Work_by_order.work FROM Orders JOIN Work_by_order ON Orders.Id_order = Work_by_order.Id_order WHERE Work_by_order.Id_workers  = {Class1.id}";
-            SqlCommand command = new SqlCommand(zadan, db.getConnection());
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            Protm.DataSource = table;
-
-            for (int j = 0; j < Protm.RowCount; j++)
-            {
-                switch (Protm[3, j].Value.ToString())
-                {
-
-                    case "Не начато":
-                        for (int i = 0; i < 5; i++)
-                        {
-                            Protm[i, j].Style.BackColor = Color.Red;
-                        }
-                        break;
-                    case "В разработке":
-                        for (int i = 0; i < 5; i++)
-                        {
-                            Protm[i, j].Style.BackColor = Color.Orange;
-                        }
-                        break;
-                   
-                    case "Выполнено":
-                        for (int i = 0; i < 5; i++)
-                        {
-                            Protm[i, j].Style.BackColor = Color.YellowGreen;
-                        }
-                        break;
-                    case "Изменено":
-                        for (int i = 0; i < 5; i++)
-                        {
-                            Protm[i, j].Style.BackColor = Color.SkyBlue;
-                        }
-                        break;
-
-
-                }
-            }
-        }
-        private void Programmer_Load(object sender, EventArgs e)
-        {
-            update();
-        }
-
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            int selectedRow = e.RowIndex;
-            // Проверяем, что индекс строки положителен
-            if (e.RowIndex >= 0)
-            {
-                // Получаем выбранную строку
-                DataGridViewRow row = Protm.Rows[selectedRow];
-                id_orderr = Convert.ToInt32(row.Cells[0].Value.ToString());
-                label2.Text = "До: " + row.Cells[1].Value.ToString();
-                label3.Text = row.Cells[4].Value.ToString();
-                label1.Text = row.Cells[2].Value.ToString();
-
-            }
-        }
-        public void obn()
-        {
-
-        }
-        int id_orderr = 0;
-        private void button10_Click(object sender, EventArgs e)
-        {
-            update();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            if (id_orderr == 0)
-            {
-                MessageBox.Show("Выбери заказ!", "надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            var updateQuery = $"UPDATE Work_by_order SET status_workera='{button1.Text}' WHERE id_order={id_orderr} AND  Id_workers = {Class1.id}";
-            DB db = new DB();
-            // Выполняем SQL-запрос
-            using (var command = new SqlCommand(updateQuery, db.getConnection()))
-            {
-                db.openConnection();
-                command.ExecuteNonQuery();
-                db.closeConnection();
-            }
-            update();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            {
-                if (id_orderr == 0)
-                {
-                    MessageBox.Show("Выбери заказ!", "надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-                var updateQuery = $"UPDATE Work_by_order SET status_workera='{button2.Text}' WHERE id_order={id_orderr} AND  Id_workers = {Class1.id}";
-                DB db = new DB();
-                // Выполняем SQL-запрос
-                using (var command = new SqlCommand(updateQuery, db.getConnection()))
-                {
-                    db.openConnection();
-                    command.ExecuteNonQuery();
-                    db.closeConnection();
-                }
-                update();
+                // Переход на страницу редактирования выбранного семени
+                await Navigation.PushAsync(new EditSeedPage(selectedSeed));
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        protected override void OnAppearing()
         {
-            if (id_orderr == 0)
-            {
-                MessageBox.Show("Выбери заказ!", "надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            var updateQuery = $"UPDATE Work_by_order SET status_workera='{button3.Text}' WHERE id_order={id_orderr} AND  Id_workers= {Class1.id}";
-            DB db = new DB();
-            // Выполняем SQL-запрос
-            using (var command = new SqlCommand(updateQuery, db.getConnection()))
-            {
-                db.openConnection();
-                command.ExecuteNonQuery();
-                db.closeConnection();
-            }
-            update();
-        }
-
-        private void Programmer_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-        }
-    }
-}
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace Raspredelenie_rabot
-{
-    public partial class Reg : Form
-    {
-        public Reg()
-        {
-            InitializeComponent();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            if (textBox3.PasswordChar == 0)
-            {
-                textBox3.PasswordChar = '*';
-                textBox4.PasswordChar = '*';
-                button2.Image = Image.FromFile("open_eye.png");
-            }
-            else
-            {
-                textBox3.PasswordChar = '\0';
-                textBox4.PasswordChar = '\0';
-                button2.Image = Image.FromFile("close_eye.png");
-            }
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-           
-            string lastname = textBox1.Text;
-            string Organization = textBox6.Text;
-            string Login = textBox2.Text;
-            string Password = textBox3.Text;
-            string Passwordproverka = textBox4.Text;
-
-            if (Password == "" || Passwordproverka == "" || Login == "")
-            {
-                label5.Text = "Пожалуйста, введите логин/пароль";
-                return;
-            }
-            if (lastname == "" || lastname == "")
-            {
-                label5.Text = "Пожалуйста, введите название организации/фамилию";
-                return;
-            }
-            else if (Password != Passwordproverka)
-            {
-                label5.Text = "Пожалуйста, подтвердите пароль";
-                return;
-
-            }
-            DB db = new DB();
-            SqlDataAdapter adapter = new SqlDataAdapter();
-            DataTable table = new DataTable();
-            string query = $"select Login_customer from Customer where Login_customer = '{Login}'";
-            SqlCommand command = new SqlCommand(query, db.getConnection());
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            db.openConnection();
-            if (table.Rows.Count == 0)
-            {
-                // Если пользователя нет, выполняем запрос на добавление нового пользователя в базу данных.
-                SqlCommand insertCommand = new SqlCommand($"insert into Customer (Lastname_customer, Organization, Login_customer, Password_customer) values ('{lastname}', '{Organization}', '{Login}',  '{Password}')", db.getConnection());
-                // Если запрос выполнен успешно, выводим сообщение об успешной регистрации и открываем форму входа.
-                if (insertCommand.ExecuteNonQuery() == 1)
-                {
-                    MessageBox.Show("Регистрация прошла успешно!", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    Log frmlog = new Log();
-                    this.Hide();
-                    frmlog.Show();
-
-                }
-
-            }
-            else
-            {
-                label5.Text = "Аккаунт не создан";
-            }
-            db.closeConnection();
-
-        }
-
-        private void Form3_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void Reg_Load(object sender, EventArgs e)
-        {
-
-        }
-    }
-}
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-
-namespace Raspredelenie_rabot
-{
-    public partial class Sozd : Form
-    {
-        public Sozd()
-        {
-
-            InitializeComponent();
-
-        }
-        DB db = new DB();
-        public void soz()
-        {
-            if (Class1.txt == "popr")
-            {
-                int id = Class1.id_ord;
-                var popr = textBox1.Text;
-                var srook = dateTimePicker1.Text;
-                // Строка для выполнения SQL-запроса на обновление данных в базе
-                var updateQuery = $"UPDATE Orders SET Id_customer='{Class1.id}', term='{srook}', explanation='{popr}', Status='Изменено' WHERE id_order={id}";
-
-                // Выполняем SQL-запрос
-                using (var command = new SqlCommand(updateQuery, db.getConnection()))
-                {
-                    db.openConnection();
-                    command.ExecuteNonQuery();
-                    db.closeConnection();
-                }
-                MessageBox.Show($"Заказ поправлен");
-                this.Hide();
-            }
-            else
-            {
-                string opisanue = textBox1.Text;
-                string srok = dateTimePicker1.Text;
-                DB db = new DB();
-                if (opisanue == "" || srok == "")
-                {
-                    label2.Text = "Пожалуйста, не оставляйте пустых полей";
-                    return;
-                }
-                db.openConnection();
-                SqlCommand insertCommand = new SqlCommand($"insert into Orders (Id_customer, term, explanation, Status) values ({Class1.id}, '{srok}', '{opisanue}', 'Не начато')", db.getConnection());
-                // Если запрос выполнен успешно, выводим сообщение об успешной регистрации и открываем форму входа.
-                insertCommand.ExecuteNonQuery();
-                MessageBox.Show("Заказ успешно зарегестрирован", "Успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                db.closeConnection();
-
-                this.Hide();
-
-            }
-        }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            soz();
-        }
-
-        private void Sozd_Load(object sender, EventArgs e)
-        {
-            if (Class1.txt == "popr")
-            {
-                textBox1.Text = Class1.popr;
-                dateTimePicker1.Text = Class1.srook;
-            }
-        }
-
-        private void Sozd_FormClosed(object sender, FormClosedEventArgs e)
-        {
-    
-        }
-    }
-
-}
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
-
-namespace Raspredelenie_rabot
-{
-    public partial class Timlid : Form
-    {
-        public Timlid()
-        {
-            InitializeComponent();
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void Timlid_Load(object sender, EventArgs e)
-        {
-            update();
-            DB db = new DB();
-            DataTable table1 = new DataTable();
-            SqlDataAdapter adapter1 = new SqlDataAdapter();
-            dataGridView2.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            table1.Clear();
-            string zadan1 = $"select Id_workers, Name_workers, Lastname_workers, Patronymic_workers, Post from [Workers] where Post = 'Prog' or Post = 'Rekl'";
-            SqlCommand command1 = new SqlCommand(zadan1, db.getConnection());
-            adapter1.SelectCommand = command1;
-            adapter1.Fill(table1);
-            dataGridView2.DataSource = table1;
-            for (int j = 0; j < dataGridView2.RowCount; j++)
-                switch (dataGridView2[4, j].Value.ToString())
-                {
-
-                    case "Prog":
-                        for (int i = 0; i < 5; i++)
-                        {
-                            dataGridView2[i, j].Style.BackColor = Color.SkyBlue;
-                        }
-                        break;
-                    case "Rekl":
-                        for (int i = 0; i < 5; i++)
-                        {
-                            dataGridView2[i, j].Style.BackColor = Color.Gray;
-                        }
-                        break;
-
-                }
-
-
-        }
-        private void update()
-        {
-            DataTable table = new DataTable();
-            DB db = new DB();
-            SqlDataAdapter adapter = new SqlDataAdapter();
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            table.Clear();
-            string zadan = $"select id_order, term, explanation, Status from [Orders]";
-            SqlCommand command = new SqlCommand(zadan, db.getConnection());
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            dataGridView1.DataSource = table;
-
-            for (int j = 0; j < dataGridView1.RowCount; j++)
-            {
-                switch (dataGridView1[3, j].Value.ToString())
-                {
-
-                    case "Не начато":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            dataGridView1[i, j].Style.BackColor = Color.Red;
-                        }
-                        break;
-                    case "В работе":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            dataGridView1[i, j].Style.BackColor = Color.Orange;
-                        }
-                        break;
-                    case "Маркетинг готов":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            dataGridView1[i, j].Style.BackColor = Color.Gold;
-                        }
-                        break;
-                    case "Программа написанна":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            dataGridView1[i, j].Style.BackColor = Color.Gold;
-                        }
-                        break;
-                    case "Выполнено":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            dataGridView1[i, j].Style.BackColor = Color.YellowGreen;
-                        }
-                        break;
-                    case "Изменено":
-                        for (int i = 0; i < 4; i++)
-                        {
-                            dataGridView1[i, j].Style.BackColor = Color.SkyBlue;
-                        }
-                        break;
-                }
-            }
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            DB db = new DB();
-            db.openConnection();
-            SqlDataAdapter adapter = new SqlDataAdapter();
-            DataTable table = new DataTable();
-            string query = $"select Id_order, Id_workers, status_workera from Work_by_order where Id_order = '{id_orderr}' and Id_workers = '{id_workerr}'";
-            SqlCommand command = new SqlCommand(query, db.getConnection());
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            db.openConnection();
-            if (id_orderr == 0 || id_workerr == 0)
-            {
-                return;
-            }
-            if (table.Rows.Count == 0)
-            {
-                SqlCommand insertCommand = new SqlCommand($"insert into Work_by_order (Id_order, Id_workers, status_workera) values ({id_orderr}, '{id_workerr}', 'Не начато')", db.getConnection());
-                // Если запрос выполнен успешно, выводим сообщение об успешной регистрации и открываем форму входа.
-                insertCommand.ExecuteNonQuery();
-
-
-
-                DataTable table1 = new DataTable();
-                SqlDataAdapter adapter1 = new SqlDataAdapter();
-                Gotm.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-                table1.Clear();
-                string zadan = $"SELECT Workers.Id_workers, Workers.Name_workers, Workers.Lastname_workers, Workers.Patronymic_workers, Workers.Post, Work_by_order.status_workera FROM Workers JOIN Work_by_order ON Workers.Id_workers = Work_by_order.Id_workers WHERE Work_by_order.Id_order = {id_orderr}; ";
-                SqlCommand command1 = new SqlCommand(zadan, db.getConnection());
-                adapter1.SelectCommand = command1;
-                adapter1.Fill(table1);
-                Gotm.DataSource = table1;
-                for (int j = 0; j < Gotm.RowCount; j++)
-                {
-                    switch (Gotm[5, j].Value.ToString())
-                    {
-
-                        case "Не начато":
-                            for (int i = 0; i < 6; i++)
-                            {
-                                Gotm[i, j].Style.BackColor = Color.Red;
-                            }
-                            break;
-                        case "В работе":
-                            for (int i = 0; i < 6; i++)
-                            {
-                                Gotm[i, j].Style.BackColor = Color.Orange;
-                            }
-                            break;
-                        case "Выполнено":
-                            for (int i = 0; i < 6; i++)
-                            {
-                                Gotm[i, j].Style.BackColor = Color.YellowGreen;
-                            }
-                            break;
-
-                    }
-                }
-            }
-            else
-            {
-                MessageBox.Show("Не добавлен!", "Не надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-
-        }
-        public int id_orderr = 0;
-        public int id_workerr = 0;
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            id_workerrs = 0;
-            int selectedRow = e.RowIndex;
-            // Проверяем, что индекс строки положителен
-            if (e.RowIndex >= 0)
-            {
-                // Получаем выбранную строку
-                DataGridViewRow row = dataGridView1.Rows[selectedRow];
-                id_orderr = Convert.ToInt32(row.Cells[0].Value.ToString());
-
-            }
-            DataTable table = new DataTable();
-            DB db = new DB();
-            SqlDataAdapter adapter = new SqlDataAdapter();
-            Gotm.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            table.Clear();
-            string zadan = $"SELECT Workers.Id_workers, Workers.Name_workers, Workers.Lastname_workers, Workers.Patronymic_workers,  Workers.Post, Work_by_order.status_workera FROM Workers JOIN Work_by_order ON Workers.Id_workers = Work_by_order.Id_workers WHERE Work_by_order.Id_order = {id_orderr}; ";
-            SqlCommand command = new SqlCommand(zadan, db.getConnection());
-            adapter.SelectCommand = command;
-            adapter.Fill(table);
-            Gotm.DataSource = table;
-
-            for (int j = 0; j < Gotm.RowCount; j++)
-            {
-                switch (Gotm[5, j].Value.ToString())
-                {
-
-                    case "Не начато":
-                        for (int i = 0; i < 6; i++)
-                        {
-                            Gotm[i, j].Style.BackColor = Color.Red;
-                        }
-                        break;
-                    case "В разработке":
-                        for (int i = 0; i < 6; i++)
-                        {
-                            Gotm[i, j].Style.BackColor = Color.Orange;
-                        }
-                        break;
-                    case "Выполнено":
-                        for (int i = 0; i < 6; i++)
-                        {
-                            Gotm[i, j].Style.BackColor = Color.YellowGreen;
-                        }
-                        break;
-                    case "Изменено":
-                        for (int i = 0; i < 6; i++)
-                        {
-                            Gotm[i, j].Style.BackColor = Color.SkyBlue;
-                        }
-                        break;
-
-                }
-            }
-        }
-
-        private void dataGridView2_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            {
-                int selectedRow = e.RowIndex;
-                // Проверяем, что индекс строки положителен
-                if (e.RowIndex >= 0)
-                {
-                    // Получаем выбранную строку
-                    DataGridViewRow row = dataGridView2.Rows[selectedRow];
-                    id_workerr = Convert.ToInt32(row.Cells[0].Value.ToString());
-
-                }
-            }
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            pro();
-        }
-        public void pro()
-        {
-            DB db = new DB();
-            DataTable table1 = new DataTable();
-            SqlDataAdapter adapter1 = new SqlDataAdapter();
-            dataGridView2.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            table1.Clear();
-            string zadan1 = $"select Id_workers, Name_workers, Lastname_workers, Patronymic_workers, Post from [Workers] where Post = 'Prog'";
-            SqlCommand command1 = new SqlCommand(zadan1, db.getConnection());
-            adapter1.SelectCommand = command1;
-            adapter1.Fill(table1);
-            dataGridView2.DataSource = table1;
-        }
-
-        private void button11_Click(object sender, EventArgs e)
-        {
-            DB db = new DB();
-            DataTable table1 = new DataTable();
-            SqlDataAdapter adapter1 = new SqlDataAdapter();
-            dataGridView2.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            table1.Clear();
-            string zadan1 = $"select Id_workers, Name_workers, Lastname_workers, Patronymic_workers, Post from [Workers] where Post = 'Prog' or Post = 'Rekl' ";
-            SqlCommand command1 = new SqlCommand(zadan1, db.getConnection());
-            adapter1.SelectCommand = command1;
-            adapter1.Fill(table1);
-            dataGridView2.DataSource = table1;
-            for (int j = 0; j < dataGridView2.RowCount; j++)
-                switch (dataGridView2[4, j].Value.ToString())
-                {
-
-                    case "Prog":
-                        for (int i = 0; i < 5; i++)
-                        {
-                            dataGridView2[i, j].Style.BackColor = Color.SkyBlue;
-                        }
-                        break;
-                    case "Rekl":
-                        for (int i = 0; i < 5; i++)
-                        {
-                            dataGridView2[i, j].Style.BackColor = Color.Gray;
-                        }
-                        break;
-
-                }
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            rek();
-        }
-        public void rek()
-        {
-            DB db = new DB();
-            DataTable table1 = new DataTable();
-            SqlDataAdapter adapter1 = new SqlDataAdapter();
-            dataGridView2.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            table1.Clear();
-            string zadan1 = $"select Id_workers, Name_workers, Lastname_workers, Patronymic_workers, Post from [Workers] where Post = 'Rekl'";
-            SqlCommand command1 = new SqlCommand(zadan1, db.getConnection());
-            adapter1.SelectCommand = command1;
-            adapter1.Fill(table1);
-            dataGridView2.DataSource = table1;
-        }
-
-        private void button8_Click(object sender, EventArgs e)
-        {
-            if (id_orderr == 0)
-            {
-                MessageBox.Show("Выбери заказ!", "надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            var updateQuery = $"UPDATE Orders SET Status='{button8.Text}' WHERE id_order={id_orderr}";
-            DB db = new DB();
-            // Выполняем SQL-запрос
-            using (var command = new SqlCommand(updateQuery, db.getConnection()))
-            {
-                db.openConnection();
-                command.ExecuteNonQuery();
-                db.closeConnection();
-            }
-            update();
-        }
-
-        private void button7_Click(object sender, EventArgs e)
-        {
-            if (id_orderr == 0)
-            {
-                MessageBox.Show("Выбери заказ!", "надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            var updateQuery = $"UPDATE Orders SET Status='{button7.Text}' WHERE id_order={id_orderr}";
-            DB db = new DB();
-            // Выполняем SQL-запрос
-            using (var command = new SqlCommand(updateQuery, db.getConnection()))
-            {
-                db.openConnection();
-                command.ExecuteNonQuery();
-                db.closeConnection();
-            }
-            update();
-        }
-
-        private void button6_Click(object sender, EventArgs e)
-        {
-            if (id_orderr == 0)
-            {
-                MessageBox.Show("Выбери заказ!", "надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            var updateQuery = $"UPDATE Orders SET Status='{button6.Text}' WHERE id_order={id_orderr}";
-            DB db = new DB();
-            // Выполняем SQL-запрос
-            using (var command = new SqlCommand(updateQuery, db.getConnection()))
-            {
-                db.openConnection();
-                command.ExecuteNonQuery();
-                db.closeConnection();
-            }
-            update();
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            if (id_orderr == 0)
-            {
-                MessageBox.Show("Выбери заказ!", "надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            var updateQuery = $"UPDATE Orders SET Status='{button5.Text}' WHERE id_order={id_orderr}";
-            DB db = new DB();
-            // Выполняем SQL-запрос
-            using (var command = new SqlCommand(updateQuery, db.getConnection()))
-            {
-                db.openConnection();
-                command.ExecuteNonQuery();
-                db.closeConnection();
-            }
-            update();
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            if (id_orderr == 0)
-            {
-                MessageBox.Show("Выбери заказ!", "надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            var updateQuery = $"UPDATE Orders SET Status='{button4.Text}' WHERE id_order={id_orderr}";
-            DB db = new DB();
-            // Выполняем SQL-запрос
-            using (var command = new SqlCommand(updateQuery, db.getConnection()))
-            {
-                db.openConnection();
-                command.ExecuteNonQuery();
-                db.closeConnection();
-            }
-            update();
-        }
-
-        private void button12_Click(object sender, EventArgs e)
-        {
-            if (id_orderr == 0)
-            {
-                MessageBox.Show("Выбери заказ!", "надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            if (id_workerrs == 0)
-            {
-                MessageBox.Show("Выбери кому пишите!", "надо", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            Work work = new Work();
-            work.ShowDialog();
-            var updateQuery = $"UPDATE Work_by_order SET work = '{Class1.worrk}', status_workera = 'Изменено' WHERE Id_workers = '{id_workerrs}' AND Id_order = '{id_orderr}'";
-            DB db = new DB();
-            // Выполняем SQL-запрос
-            using (var command = new SqlCommand(updateQuery, db.getConnection()))
-            {
-                db.openConnection();
-                command.ExecuteNonQuery();
-                db.closeConnection();
-            }
-            DataTable table1 = new DataTable();
-
-            SqlDataAdapter adapter1 = new SqlDataAdapter();
-            Gotm.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            table1.Clear();
-            string zadan = $"SELECT Workers.Id_workers, Workers.Name_workers, Workers.Lastname_workers, Workers.Patronymic_workers, Workers.Post, Work_by_order.status_workera FROM Workers JOIN Work_by_order ON Workers.Id_workers = Work_by_order.Id_workers WHERE Work_by_order.Id_order = {id_orderr}; ";
-            SqlCommand command1 = new SqlCommand(zadan, db.getConnection());
-            adapter1.SelectCommand = command1;
-            adapter1.Fill(table1);
-            Gotm.DataSource = table1;
-
-            for (int j = 0; j < Gotm.RowCount; j++)
-            {
-                switch (Gotm[5, j].Value.ToString())
-                {
-
-                    case "Не начато":
-                        for (int i = 0; i < 6; i++)
-                        {
-                            Gotm[i, j].Style.BackColor = Color.Red;
-                        }
-                        break;
-                    case "В разработке":
-                        for (int i = 0; i < 6; i++)
-                        {
-                            Gotm[i, j].Style.BackColor = Color.Orange;
-                        }
-                        break;
-                    case "Выполнено":
-                        for (int i = 0; i < 6; i++)
-                        {
-                            Gotm[i, j].Style.BackColor = Color.YellowGreen;
-                        }
-                        break;
-                    case "Изменено":
-                        for (int i = 0; i < 6; i++)
-                        {
-                            Gotm[i, j].Style.BackColor = Color.SkyBlue;
-                        }
-                        break;
-
-                }
-
-            }
-        }
-        int id_workerrs = 0;
-        private void dataGridView3_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            int selectedRow = e.RowIndex;
-            // Проверяем, что индекс строки положителен
-            if (e.RowIndex >= 0)
-            {
-                // Получаем выбранную строку
-                DataGridViewRow row = Gotm.Rows[selectedRow];
-                id_workerrs = Convert.ToInt32(row.Cells[0].Value.ToString());
-
-            }
-
-        }
-
-        private void Timlid_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            Application.Exit();
-        }
-    }
-}
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace Raspredelenie_rabot
-{
-    public partial class Work : Form
-    {
-        public Work()
-        {
-            InitializeComponent();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Class1.worrk = textBox1.Text;
-            this.Hide();
-
-        }
-
-        private void work_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            
-
-        }
-
-        private void work_Load(object sender, EventArgs e)
-        {
-
+            base.OnAppearing();
+            // Обновляем данные при возвращении на страницу
+            WarehouseListView.ItemsSource = null;
+            WarehouseListView.ItemsSource = Warehouse.Seeds;
         }
     }
 }
